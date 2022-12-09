@@ -202,7 +202,7 @@ namespace CarsOOP3
     {
 
         public double TravelTime { get; set; }
-        public double Distance { get; protected set; }//162 трябва да се премахне, защото е default стойност
+        public double Distance { get; protected set; }
         public string ModelCar { get; protected set; }
 
         public TravelInfo(double TravelTime, double Distance, string ModelCar)
