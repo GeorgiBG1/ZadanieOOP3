@@ -1,4 +1,6 @@
 ﻿using CarsOOP3;
+using System.Data.Common;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 
 namespace CarsOOP3
@@ -7,20 +9,166 @@ namespace CarsOOP3
     {
         static void Main(string[] args)
         {
-            //ElectricCarData carModel1 = new ElectricCarData("Model 3", CarModel.Manufacture.Tesla, 2017, 265.8, 3000, 350, new Battery(230, "Lithium-ion"), 34);
-            //TravelInfo travelInfo = new TravelInfo(53, 200, "Model 3");
-            //Tank tank = new Tank(100, "Benzine");
-            //FuelCarData carModel2 = new FuelCarData("Focus", CarModel.Manufacture.Ford, 1990, 269, 1200, 200, new Tank(340, "Disel"), 34);
-
-            //carModel1.Recharge();
-            //carModel2.Refuel();
-
-            dynamic a = 1;
-            Console.WriteLine(a);
-            a = "A";
-            Console.WriteLine(a);
-            dynamic b = new Tank();
-            Console.WriteLine(b);
+            Console.WriteLine("Do you want to create a new car? \n Enter Yes/No");
+            string input1 = Console.ReadLine()!;
+            input1.ToLower();
+            while (input1== "yes")
+            {
+                Console.WriteLine("Choose a fuel car or an electric car \n Enter Fuel/Electric");
+                bool fuelOrElectric = false; // false for fuel, true for electric
+                bool defaultOrNot = false; // false for default, true for not
+                var tank = new Tank();
+                var battery = new Battery();
+                string type = Console.ReadLine()!;
+                type.ToLower();
+                if (type == "fuel")
+                {
+                    Console.WriteLine($"Enter type of the tank and max capacity or continue with default values (Enter Default)\n");
+                    type = Console.ReadLine()!;
+                    type.ToLower();
+                    if (type == "default") { break; }
+                    double capacity = int.Parse(Console.ReadLine()!);
+                    tank = new Tank(capacity, type!);
+                    defaultOrNot = true;
+                }
+                else if (type == "electric")
+                {
+                    fuelOrElectric = true;
+                    Console.WriteLine($"Enter type of the battery and max capacity or continue with default values (Enter Default)\n");
+                    type = Console.ReadLine()!;
+                    type.ToLower();
+                    if (type == "default") { break; }
+                    double capacity = int.Parse(Console.ReadLine()!);
+                    battery = new Battery(capacity, type!);
+                    defaultOrNot = true;
+                }
+                Console.WriteLine("Enter model");
+                string model = Console.ReadLine()!;
+                Console.WriteLine("Enter manifacturer Ford, Mercedec, BMW, Audi, Tesla");
+                string manifacturer = Console.ReadLine()!;
+                manifacturer.ToLower();
+                var manifacturer1 = CarModel.Manufacture.Ford;
+                if (manifacturer == "mercedec")
+                {
+                    manifacturer1 = CarModel.Manufacture.Mercedes;
+                }
+                else if (manifacturer == "bmw")
+                {
+                    manifacturer1 = CarModel.Manufacture.BMW;
+                }
+                else if (manifacturer == "audi")
+                {
+                    manifacturer1 = CarModel.Manufacture.Audi;
+                }
+                else if (manifacturer == "tesla")
+                {
+                    manifacturer1 = CarModel.Manufacture.Tesla;
+                }
+                Console.WriteLine("Enter year of make");
+                int yearOfMake = int.Parse(Console.ReadLine()!);
+                Console.WriteLine("Enter max speed");
+                double maxSpeed = double.Parse(Console.ReadLine()!);
+                Console.WriteLine("Enter weight and load capacity");
+                double weight = double.Parse(Console.ReadLine()!);
+                double loadCapacity = double.Parse(Console.ReadLine()!);
+                Console.WriteLine("Enter max travel coefficent");
+                double maxTravelCoef = double.Parse(Console.ReadLine()!);
+                if (fuelOrElectric == true)
+                {
+                    if (defaultOrNot == false)
+                    {
+                        Battery battery1 = new Battery();
+                        ElectricCarData car = new ElectricCarData(model, manifacturer1, yearOfMake, maxSpeed, weight, loadCapacity, battery1, maxTravelCoef);
+                        Console.WriteLine("Test run or recharge \n Enter Test/Recharge");
+                        dynamic input2 = "";
+                        input2 = Console.ReadLine()!;
+                        input2.ToLower();
+                        if (input2 == "test")
+                        {
+                            Console.WriteLine("Enter distance and travel time");
+                            input2 = double.Parse(Console.ReadLine()!);
+                            double travelTime = double.Parse(Console.ReadLine()!);
+                            CarModel carModel = car;
+                            car.GetHoursForTravel(input2!);
+                            car.Travel(input2!);
+                            TravelInfo travelInfo = new TravelInfo(travelTime, input2, car.Model);
+                            travelInfo.ToString();
+                        }
+                        else if (input2 == "recharge")
+                        {
+                            battery1.Recharge();
+                        }
+                    }
+                    ElectricCarData car1 = new ElectricCarData(model, manifacturer1, yearOfMake, maxSpeed, weight, loadCapacity, battery, maxTravelCoef);
+                    Console.WriteLine("Test run or recharge \n Enter Test/Recharge");
+                    dynamic input = "";
+                    input= Console.ReadLine()!;
+                    input.ToLower();
+                    if (input == "test")
+                    {
+                        Console.WriteLine("Enter distance and travel time");
+                        input = double.Parse(Console.ReadLine()!);
+                        double travelTime = double.Parse(Console.ReadLine()!);
+                        CarModel carModel = car1;
+                        car1.GetHoursForTravel(input!);
+                        car1.Travel(input!);
+                        TravelInfo travelInfo = new TravelInfo(travelTime, input, car1.Model);
+                        travelInfo.ToString();
+                    }
+                    else if (input == "recharge")
+                    {
+                        battery.Recharge();
+                    }
+                }
+                else
+                {
+                    if (defaultOrNot == false)
+                    {
+                        Tank tank1 = new Tank();
+                        FuelCarData car2 = new FuelCarData(model, manifacturer1, yearOfMake, maxSpeed, weight, loadCapacity, tank1, maxTravelCoef);
+                        Console.WriteLine("Test run or recharge \n Enter Test/Recharge");
+                        dynamic input2 = "";
+                        input2= Console.ReadLine()!;
+                        input2.ToLower();
+                        if (input2 == "test")
+                        {
+                            Console.WriteLine("Enter distance and travel time");
+                            input2 = double.Parse(Console.ReadLine()!);
+                            double travelTime = double.Parse(Console.ReadLine()!);
+                            CarModel carModel = car2;
+                            car2.GetHoursForTravel(input2!);
+                            car2.Travel(input2!);
+                            TravelInfo travelInfo = new TravelInfo(travelTime, input2, car2.Model);
+                            travelInfo.ToString();
+                        }
+                        else if (input2 == "recharge")
+                        {
+                            car2.Refuel();
+                        }
+                    }
+                    FuelCarData car3 = new FuelCarData(model, manifacturer1, yearOfMake, maxSpeed, weight, loadCapacity, tank, maxTravelCoef);
+                    Console.WriteLine("Test run or refuel \n Enter Test/Refuel");
+                    Console.WriteLine("Test run or recharge \n Enter Test/Recharge");
+                    dynamic input = "";
+                    input= Console.ReadLine()!;
+                    input.ToLower();
+                    if (input == "test")
+                    {
+                        Console.WriteLine("Enter distance and travel time");
+                        input = double.Parse(Console.ReadLine()!);
+                        double travelTime = double.Parse(Console.ReadLine()!);
+                        CarModel carModel = car3;
+                        car3.GetHoursForTravel(input!);
+                        car3.Travel(input!);
+                        TravelInfo travelInfo = new TravelInfo(travelTime, input, car3.Model);
+                        travelInfo.ToString();
+                    }
+                    else if (input == "refuel")
+                    {
+                        car3.Refuel();
+                    }
+                }
+            }
         }
     }
 
@@ -47,7 +195,7 @@ namespace CarsOOP3
         public double Weight { get; protected set; }
         public double LoadCappacity { get; protected set; }
 
-        protected double GetHoursForTravel(double distance)
+        public double GetHoursForTravel(double distance)
         {
             double hours = distance / (double)MaxSpeedKmPh;
             return hours;
@@ -58,7 +206,7 @@ namespace CarsOOP3
     public class ElectricCarData : CarModel, ITravelable
     {
         private double capacity;
-        private Battery Battery { get => Battery; set => Battery = value; }
+        private Battery Battery { get; set; }
         public double TravelDistanceKoef { get; protected set; } = 120;
         //public double MaxTravelDistance { get { return Battery.MaxCapacity; } private set { Battery.MaxCapacity } } =  ;
         public double MaxTravelDistance
@@ -85,16 +233,16 @@ namespace CarsOOP3
         public TravelInfo Travel(double distance)
         {
             double remainingCapacity = distance / TravelDistanceKoef;
-            if(distance < MaxTravelDistance)
+            if (distance < MaxTravelDistance)
             {
-                if(remainingCapacity > Battery.RemainingCapacity)
+                if (remainingCapacity > Battery.RemainingCapacity)
                 {
-                    return new TravelInfo(GetHoursForTravel(distance), distance, Model);
+                    return new TravelInfo(GetHoursForTravel(distance), distance, Model!);
                 }
                 else
                 {
                     Console.WriteLine("Recharge needed..." + null);
-                    return new TravelInfo(GetHoursForTravel(distance), distance, Model);
+                    return new TravelInfo(GetHoursForTravel(distance), distance, Model!);
                 }
             }
             else
@@ -106,7 +254,7 @@ namespace CarsOOP3
     public class FuelCarData : CarModel, ITravelable
     {
         private double tankCapacity;
-        private Tank Tank { get => Tank; set => Tank = value; }
+        private Tank Tank { get; set; }
 
         //public double Tank { get; protected set; }
         public double TravelDistanceKoef { get; protected set; } = 10;
@@ -141,12 +289,12 @@ namespace CarsOOP3
             {
                 if (remainingCapacity > Tank.RemainingCapacity)
                 {
-                    return new TravelInfo(GetHoursForTravel(distance), distance, Model);
+                    return new TravelInfo(GetHoursForTravel(distance), distance, Model!);
                 }
                 else
                 {
                     Console.WriteLine("Recharge needed..." + null);
-                    return new TravelInfo(GetHoursForTravel(distance), distance, Model);
+                    return new TravelInfo(GetHoursForTravel(distance), distance, Model!);
                 }
             }
             else
