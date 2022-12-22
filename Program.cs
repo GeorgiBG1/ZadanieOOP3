@@ -15,7 +15,7 @@ namespace CarsOOP3
             double maxSpeedForFirstCar = 333.1;
             double weightForFirstCar = 2003.4;
             double loadCapacityForFirstCar = 123.7;
-            Tank tankForFirstCar = new Tank(600, "Benzine ali baba");
+            Tank tankForFirstCar = new Tank(60, "Benzine ali baba");
             double travelDistanceKoefForFirstCar = 3.5;
             FuelCarData myFirstCarWithStockTank = new FuelCarData
                 (
@@ -39,7 +39,7 @@ namespace CarsOOP3
                 travelDistanceKoefForFirstCar,
                 tankForFirstCar
                 );
-            //tankForFirstCar.RemainingCapacity = 5000;
+            myFirstCarWithCustomTank.Refuel();
             #endregion
             #region Electric cars
             string model2 = "Model 3";
@@ -71,6 +71,7 @@ namespace CarsOOP3
                 travelDistanceKoefForSecondCar,
                 batteryForSecondCar
                 );
+            mySecondCarWithCustomBattery.Recharge();
             #endregion
             #region Output for fuel cars
             Console.WriteLine($"Information about my first car:\nModel: " +
@@ -79,10 +80,10 @@ namespace CarsOOP3
                 $"{myFirstCarWithStockTank.MaxSpeedKmPh}km/h,\nWeight: " +
                 $"{myFirstCarWithStockTank.Weight}kg,\nLoad capacity: " +
                 $"{myFirstCarWithStockTank.LoadCappacity}kg.\n\nAdditional information about tank:\nStock tank\nTravel distance coefficient with stock tank: " +
-                $"{myFirstCarWithStockTank.TravelDistanceKoef}%, \nMax travel distance: " +
-                $"{myFirstCarWithStockTank.MaxTravelDistance}km/h.\n\nCustom tank\nTravel distance coefficient with stock tank: " +
-                $"{myFirstCarWithCustomTank.TravelDistanceKoef}% \nMax travel distance: " +
-                $"{myFirstCarWithCustomTank.MaxTravelDistance}km/h.\n");
+                $"{myFirstCarWithStockTank.MaxTravelDistanceKoef}%, \nMax travel distance: " +
+                $"{myFirstCarWithStockTank.MaxTravelDistance}km.\n\nCustom tank\nTravel distance coefficient with stock tank: " +
+                $"{myFirstCarWithCustomTank.MaxTravelDistanceKoef}% \nMax travel distance: " +
+                $"{myFirstCarWithCustomTank.MaxTravelDistance}km.\n");
             Console.WriteLine("Write a car model and enter values for travel time and distance");
             double distance = double.Parse(Console.ReadLine()!);
             Console.WriteLine($"Travel: \n{myFirstCarWithCustomTank.Travel(distance)}\n");
@@ -93,14 +94,25 @@ namespace CarsOOP3
                 $"{mySecondCarWithStockBattery.StartYearOfModel},\nMaxSpeed: " +
                 $"{mySecondCarWithStockBattery.MaxSpeedKmPh}km/h,\nWeight: " +
                 $"{mySecondCarWithStockBattery.Weight}kg,\nLoad capacity: " +
-                $"{mySecondCarWithStockBattery.LoadCappacity}kg.\n\nAdditional information about tank:\nStock tank\nTravel distance coefficient with stock tank: " +
+                $"{mySecondCarWithStockBattery.LoadCappacity}kg.\n\nAdditional information about battery:\nStock battery\nTravel distance coefficient with stock battery: " +
                 $"{mySecondCarWithStockBattery.TravelDistanceKoef}%, \nMax travel distance: " +
-                $"{mySecondCarWithStockBattery.MaxTravelDistance}km/h.\n\nCustom tank\nTravel distance coefficient with stock tank: " +
+                $"{mySecondCarWithStockBattery.MaxTravelDistance}km.\n\nCustom battery\nTravel distance coefficient with stock battery: " +
                 $"{mySecondCarWithCustomBattery.TravelDistanceKoef}% \nMax travel distance: " +
-                $"{mySecondCarWithCustomBattery.MaxTravelDistance}km/h.\n");
+                $"{mySecondCarWithCustomBattery.MaxTravelDistance}km.\n");
             Console.WriteLine("Write a car model and enter values for travel time and distance");
             double distance2 = double.Parse(Console.ReadLine()!);
-            Console.WriteLine($"Travel: \n{mySecondCarWithCustomBattery.Travel(distance2)}\n");
+            Console.WriteLine($"Travel: \n{mySecondCarWithCustomBattery.Travel(distance2)}\nPerhaps the battery needs charging for another run!");
+            Console.WriteLine("Do you want to exit? Enter Yes/No");
+            string exit = Console.ReadLine()!;
+            exit.ToLower();
+            while (exit!="yes")
+            {
+            Console.WriteLine("Write a car model and enter values for travel time and distance");
+            double distance3 = double.Parse(Console.ReadLine()!);
+            Console.WriteLine($"Travel: \n{mySecondCarWithCustomBattery.Travel(distance3)}\n");
+            Console.WriteLine("Do you want to exit? Enter Yes/No");
+            exit = Console.ReadLine()!;
+            }
             #endregion
         }
     }
@@ -151,7 +163,7 @@ namespace CarsOOP3
         }
         public void Recharge()
         {
-            Battery.RemainingCapacity = Battery.MaxCapacity;
+            Battery.Recharge();
         }
         public void Refuel() { throw new Exception("Cannot refuel electric car!"); }
         public TravelInfo Travel(double distance)
@@ -170,8 +182,9 @@ namespace CarsOOP3
             time /= 100;
             if (distance < MaxTravelDistance)
             {
-                if (remainingCapacity > Battery.RemainingCapacity)
+                if (remainingCapacity < Battery.RemainingCapacity)
                 {
+                    Battery.RemainingCapacity -= remainingCapacity;
                     return new TravelInfo(distance, time, Model!);
                 }
                 else
@@ -190,7 +203,7 @@ namespace CarsOOP3
     {
         public double MaxCapacity { get; protected set; }
         public double RemainingCapacity { get; set; }
-        public string Type { get; set; }//protected set
+        public string Type { get; protected set; }
         public int LifeCycles { get; set; } = 100000;
         public Battery()
         {
@@ -203,13 +216,21 @@ namespace CarsOOP3
             this.MaxCapacity = MaxCapacity;
             this.Type = Type;
         }
-        public void Recharge() { RemainingCapacity = MaxCapacity; LifeCycles -= 1; if (LifeCycles == 0) { RemainingCapacity = 0; } }
+        public void Recharge()
+        {
+            RemainingCapacity = MaxCapacity; LifeCycles -= 1;
+            if (LifeCycles == 0)
+            {
+                RemainingCapacity = 0; 
+            }
+            Console.WriteLine($"Remaining battery life cycles: {LifeCycles}"); 
+        }
     }
     public class FuelCarData : CarModel, ITravelable
     {
         private Tank Tank { get; set; }
-        public double TravelDistanceKoef;
-        public double MaxTravelDistance => TravelDistanceKoef * Tank.MaxCapacity;
+        public double MaxTravelDistanceKoef { get; protected set; } = 10;
+        public double MaxTravelDistance => MaxTravelDistanceKoef * Tank.MaxCapacity;
 
         public FuelCarData(string Model, Manufacture manufacture, int YearOfMake, double MaxSpeed, double Weight, double LoadCapacity, double TravelDistanceKoef, Tank tank = null) : base()
         {
@@ -219,7 +240,7 @@ namespace CarsOOP3
             base.Weight = Weight;
             base.LoadCappacity = LoadCapacity;
             this.Tank = tank;
-            this.TravelDistanceKoef = TravelDistanceKoef;
+            this.MaxTravelDistanceKoef = TravelDistanceKoef;
             if (tank != null)
             {
                 this.Tank = tank;
@@ -236,7 +257,7 @@ namespace CarsOOP3
         public void Recharge() { throw new Exception("Cannot recharge fuel car!"); }
         public TravelInfo Travel(double distance)
         {
-            double remainingCapacity = distance / TravelDistanceKoef;
+            double remainingCapacity = distance / MaxTravelDistanceKoef;
             var time = Math.Floor((GetHoursForTravel(distance))*100);
             int hours= (int)time / 100;
             time %= 100;
@@ -250,8 +271,9 @@ namespace CarsOOP3
             time /= 100;
             if (distance < MaxTravelDistance)
             {
-                if (remainingCapacity > Tank.RemainingCapacity)
+                if (remainingCapacity < Tank.RemainingCapacity)
                 {
+                    Tank.RemainingCapacity -= remainingCapacity;
                     return new TravelInfo(distance, time, Model!);
                 }
                 else
